@@ -36,6 +36,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -50,23 +55,33 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="StuffTester", group="TEST")  // @Autonomous(...) is the other common choice
+@TeleOp(name="MotorTester", group="TEST")  // @Autonomous(...) is the other common choice
 
-public class StuffTester extends OpMode
+public class MotorTester extends OpMode
 {
-    /* Declare OpMode members. */
-    private DcMotor TestM;
+    private DcMotor ActiveMotor;
+    private Map<String,DcMotor> Motors;
+    private String[] MotorNames;
+    private int activeIndex;
 
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-        telemetry.addData("Status", "Initializing...");
-
-        TestM = hardwareMap.dcMotor.get("TestM");
-        telemetry.addData("Status", "Initialized!");
-
+        telemetry.addData("Status", "Looking for motors....");
+        Set<Map.Entry<String,DcMotor>> motors =  hardwareMap.dcMotor.entrySet();
+        List<String> names = new LinkedList<>();
+        StringBuilder sb = new StringBuilder();
+        for(Map.Entry<String,DcMotor> entry : motors){
+            String name = entry.getKey();
+            names.add(name);
+            sb.append(name);
+            sb.append(",");
+        }
+        MotorNames = (String[])names.toArray();
+        telemetry.addData("Connected Motors",sb.toString());
+        telemetry.addData("Status","Motors Found!  Awaiting commands...");
     }
 
     /*
@@ -76,22 +91,36 @@ public class StuffTester extends OpMode
     public void init_loop() {
     }
 
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
-    @Override
-    public void start() {
-        telemetry.addData("Status","Running...");
-    }
 
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     @Override
     public void loop() {
-        TestM.setPower(gamepad1.right_stick_y);
+        boolean update = true;
+        if(gamepad1.right_bumper){
+            activeIndex++;
+            telemetry.addData("Status","Incrementing motor");
+        }else if(gamepad1.left_bumper){
+            activeIndex--;
+            telemetry.addData("Status","Decrementing motor");
+        }else if(gamepad1.a){
+            activeIndex = 0;
+            telemetry.addData("Status","Returning to start of motor list");
+        }else{
+            update = false;
+        }
+        if(update){
+            while(activeIndex>=MotorNames.length){
+                activeIndex-=MotorNames.length;
+            }
+            ActiveMotor.setPower(0);
+            telemetry.addData("Active Motor",MotorNames[activeIndex]);
+            ActiveMotor = Motors.get(MotorNames[activeIndex]);
+        }
+        ActiveMotor.setPower(gamepad1.right_stick_y);
 
-        telemetry.addData("TestM Power:  ",gamepad1.right_stick_y);
+        telemetry.addData("Active Motor Power:  ",gamepad1.right_stick_y);
     }
 
     /*
@@ -99,8 +128,7 @@ public class StuffTester extends OpMode
      */
     @Override
     public void stop() {
-        TestM.setPower(0);
-        telemetry.addData("Status","Stopped");
+        ActiveMotor.setPower(0);
     }
 
 }

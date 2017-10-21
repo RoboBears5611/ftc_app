@@ -21,14 +21,13 @@ public class MechanumDriveBase {
 
     private final static String LFMotorDefaultName = "LFMotor";
     private final static String RFMotorDefaultName = "RFMotor";
-    private final static String LBMotorDefaultName = "LMMotor";
-    private final static String RBMotorDefaultName = "RMMotor";
+    private final static String LBMotorDefaultName = "LBMotor";
+    private final static String RBMotorDefaultName = "RBMotor";
 
     private DcMotor LFMotor;
     private DcMotor RFMotor;
     private DcMotor LBMotor;
     private DcMotor RBMotor;
-
     public MechanumDriveBase(HardwareMap hardwareMap, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
