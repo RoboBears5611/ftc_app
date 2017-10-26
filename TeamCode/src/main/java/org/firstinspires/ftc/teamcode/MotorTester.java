@@ -36,6 +36,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.internal.hardware.DragonboardGPIOPin;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,9 +62,10 @@ import java.util.Set;
 public class MotorTester extends OpMode
 {
     private DcMotor ActiveMotor;
-    private Map<String,DcMotor> Motors;
+    private DcMotor[] Motors;
     private String[] MotorNames;
     private int activeIndex;
+    private long lastUpdatetime;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -70,16 +73,20 @@ public class MotorTester extends OpMode
     @Override
     public void init() {
         telemetry.addData("Status", "Looking for motors....");
-        Set<Map.Entry<String,DcMotor>> motors =  hardwareMap.dcMotor.entrySet();
+        Set<Map.Entry<String,DcMotor>> motorset =  hardwareMap.dcMotor.entrySet();
         List<String> names = new LinkedList<>();
+        List<DcMotor> motors = new LinkedList();
         StringBuilder sb = new StringBuilder();
-        for(Map.Entry<String,DcMotor> entry : motors){
+        for(Map.Entry<String,DcMotor> entry : motorset){
             String name = entry.getKey();
             names.add(name);
+            motors.add(entry.getValue());
             sb.append(name);
             sb.append(",");
         }
-        MotorNames = (String[])names.toArray();
+        MotorNames = names.toArray(new String[names.size()]);
+        Motors = motors.toArray(new DcMotor[motors.size()]);
+        activeIndex = 0;
         telemetry.addData("Connected Motors",sb.toString());
         telemetry.addData("Status","Motors Found!  Awaiting commands...");
     }
@@ -98,7 +105,9 @@ public class MotorTester extends OpMode
     @Override
     public void loop() {
         boolean update = true;
-        if(gamepad1.right_bumper){
+        if(lastUpdatetime>System.currentTimeMillis()-250) {
+            update = false;
+        }else if(gamepad1.right_bumper){
             activeIndex++;
             telemetry.addData("Status","Incrementing motor");
         }else if(gamepad1.left_bumper){
@@ -110,17 +119,27 @@ public class MotorTester extends OpMode
         }else{
             update = false;
         }
+
         if(update){
             while(activeIndex>=MotorNames.length){
                 activeIndex-=MotorNames.length;
             }
-            ActiveMotor.setPower(0);
-            telemetry.addData("Active Motor",MotorNames[activeIndex]);
-            ActiveMotor = Motors.get(MotorNames[activeIndex]);
-        }
-        ActiveMotor.setPower(gamepad1.right_stick_y);
+            if(ActiveMotor != null){
+                ActiveMotor.setPower(0);
+            }
+            lastUpdatetime = System.currentTimeMillis();
 
-        telemetry.addData("Active Motor Power:  ",gamepad1.right_stick_y);
+
+            ActiveMotor = Motors[activeIndex];
+            telemetry.addData("Active Motor",MotorNames[activeIndex]);
+        }
+        if(ActiveMotor != null){
+            ActiveMotor.setPower(gamepad1.right_stick_y);
+
+            telemetry.addData("Active Motor Power:  ",gamepad1.right_stick_y);
+            telemetry.addData("Active Motor",MotorNames[activeIndex]);
+        }
+
     }
 
     /*

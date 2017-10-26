@@ -15,7 +15,7 @@ import java.util.Set;
  * Created by FTC on 12/13/2016.
  */
 
-public class MechanumDriveBase {
+public class MechanumDriveBaseBkup {
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
 
@@ -24,16 +24,16 @@ public class MechanumDriveBase {
     private final static String LBMotorDefaultName = "LBMotor";
     private final static String RBMotorDefaultName = "RBMotor";
 
-    private final static boolean LFMotorDefaultReversed = true;
-    private final static boolean RFMotorDefaultReversed = false;
-    private final static boolean LBMotorDefaultReversed = true;
-    private final static boolean RBMotorDefaultReversed = false;
+    private final static boolean LFMotorDefaultReversed = false;
+    private final static boolean RFMotorDefaultReversed = true;
+    private final static boolean LBMotorDefaultReversed = false;
+    private final static boolean RBMotorDefaultReversed = true;
 
     private DcMotor LFMotor;
     private DcMotor RFMotor;
     private DcMotor LBMotor;
     private DcMotor RBMotor;
-    public MechanumDriveBase(HardwareMap hardwareMap, Telemetry telemetry){
+    public MechanumDriveBaseBkup(HardwareMap hardwareMap, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
     }

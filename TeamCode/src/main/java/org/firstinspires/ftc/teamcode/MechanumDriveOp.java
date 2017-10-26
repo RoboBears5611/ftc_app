@@ -12,20 +12,18 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Created by FTC on 11/21/2016.
  */
 
-@TeleOp(name = "TacoDrive",group = "drive")
+@TeleOp(name = "MechanumDrive",group = "drive")
 public class MechanumDriveOp extends OpMode {
     MechanumDriveBase mechanumDriveBase;
 
 
     @Override
     public void init(){
-        mechanumDriveBase.init();
-    }
-    public void init(String LFMotorName,String RFMotorName,String LBMotorName,String RBMotorName){
+
         mechanumDriveBase = new MechanumDriveBase(hardwareMap,telemetry);
         mechanumDriveBase.init();
-
     }
+
 
     @Override
     public void start(){
