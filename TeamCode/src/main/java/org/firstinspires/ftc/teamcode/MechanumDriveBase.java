@@ -74,7 +74,7 @@ public class MechanumDriveBase {
 
         //good fun.
         double r = Math.hypot(x, y); //Get how far the joystick is pushed
-        double robotAngle = Math.atan2(y, x) - Math.PI / 4; //Rotate everything 45 degrees, since the wheels operate on tires with an exactly 45 degree offset from forwards and backwards on the robot
+        double robotAngle = Math.atan2(-y, -x) - Math.PI / 4; //Rotate everything 45 degrees, since the wheels operate on tires with an exactly 45 degree offset from forwards and backwards on the robot
         final double LF = r * Math.cos(robotAngle) + turn; //Calculate just how much speed each wheel should get in relation to each other (as stated by some Trig!) and then multiply that by how much power we actually want (Sin and Cos won't give us that, since they are just working with angles)
         final double RF = r * Math.sin(robotAngle) - turn; //We then subtract or add to the power, according to the wheels orientation to the rest of the bot.  This change causes the robot to turn.
         final double LB = r * Math.sin(robotAngle) + turn;
