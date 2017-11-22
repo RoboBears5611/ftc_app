@@ -25,6 +25,7 @@ public class GrabberOp extends OpMode {
         mechanumDriveBase = new MechanumDriveBase(hardwareMap,telemetry);
         mechanumDriveBase.init();
         Grabber = hardwareMap.dcMotor.get("Grabber");
+        Grabber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
 
@@ -35,7 +36,22 @@ public class GrabberOp extends OpMode {
 
     @Override
     public void loop(){
-        mechanumDriveBase.move(gamepad1.right_stick_x,gamepad1.right_stick_y,gamepad1.left_stick_x);
-        Grabber.setPower(gamepad1.a?GrabberSpeed:0-(gamepad1.b?GrabberSpeed:0));
+     //   mechanumDriveBase.move(gamepad1.right_stick_x,gamepad1.right_stick_y,gamepad1.left_stick_x);
+     //   Grabber.setPower(gamepad1.a?GrabberSpeed:0-(gamepad1.b?GrabberSpeed:0));
+        int position = Grabber.getCurrentPosition();
+        telemetry.addData("Encoder Position", position);
+
+        Grabber.setTargetPosition(90);
+
+
+
+
+
+
     }
+
+
 }
+
+
+
