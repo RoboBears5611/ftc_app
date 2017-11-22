@@ -12,11 +12,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Created by FTC on 11/21/2016.
  */
 
-@TeleOp(name = "MechanumDrive",group = "drive")
+@TeleOp(name = "GrabberOp",group = "drive")
 public class GrabberOp extends OpMode {
     MechanumDriveBase mechanumDriveBase;
     DcMotor Grabber;
-    final static float GrabberSpeed  = 0.5f;
+    final static float GrabberSpeed  = 0.1f;
 
 
     @Override

@@ -49,7 +49,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  */
 
 @TeleOp(name="Encoder test", group="Test")
-@Disabled
 public class EncoderTestOp extends LinearOpMode {
     MechanumDriveBase mechanumDriveBase;
     DcMotor Grabber;
