@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -48,7 +49,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Encoder test", group="Test")
+@Autonomous(name="Encoder test", group="Test")
 public class EncoderTestOp extends LinearOpMode {
     MechanumDriveBase mechanumDriveBase;
     DcMotor Grabber;
@@ -60,34 +61,19 @@ public class EncoderTestOp extends LinearOpMode {
         mechanumDriveBase = new MechanumDriveBase(hardwareMap,telemetry);
         mechanumDriveBase.init();
         Grabber = hardwareMap.dcMotor.get("Grabber");
+        Grabber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Grabber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //   mechanumDriveBase.move(gamepad1.right_stick_x,gamepad1.right_stick_y,gamepad1.left_stick_x);
         //   Grabber.setPower(gamepad1.a?GrabberSpeed:0-(gamepad1.b?GrabberSpeed:0));
         int position = Grabber.getCurrentPosition();
         telemetry.addData("Encoder Position", position);
-
-        Grabber.setTargetPosition(90);
-        Grabber.setPower(0.5);
-        sleep(2000);
-        Grabber.setTargetPosition(0);
-        Grabber.setPower(0.5);
-        sleep(2000);
-        Grabber.setTargetPosition(90);
-        Grabber.setPower(0.5);
-        sleep(2000);
-        Grabber.setTargetPosition(0);
-        Grabber.setPower(0.5);
-        sleep(2000);
-        Grabber.setTargetPosition(90);
-        Grabber.setPower(0.5);
-        sleep(2000);
-        Grabber.setTargetPosition(0);
-        Grabber.setPower(0.5);
-        sleep(2000);
-
-
-
-
+        Grabber.setPower(GrabberSpeed);
+        for(int i = 0;i<6;i++){
+            int pos = (int)Math.pow(2,i);
+            Grabber.setTargetPosition(pos);
+            telemetry.addData("Pos",pos);
+            sleep(1000);
+        }
     }
 }
