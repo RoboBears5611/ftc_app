@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.OldenGarbaege;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "Test:  Servo",group = "Test")
+@Disabled
 public class ServoTestOp extends OpMode {
     private Servo s1;
 

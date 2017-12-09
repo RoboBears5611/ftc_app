@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OldenGarbaege;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  */
 
 @TeleOp(name = "TacoDrive",group = "drive")
+@Disabled
 public class TacoDriveOp extends OpMode {
     TacoDriveBase tacoDriveBase;
     private Telemetry telemetryFinal;

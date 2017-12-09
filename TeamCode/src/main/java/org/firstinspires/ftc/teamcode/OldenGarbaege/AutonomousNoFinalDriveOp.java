@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OldenGarbaege;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -15,6 +16,7 @@ import java.util.Set;
  */
 
 @Autonomous(name = "Autonomous (No Final Drive)" ,group = "Autonomous")
+@Disabled
 public class AutonomousNoFinalDriveOp extends LinearOpMode {
     private final static String LFMotorName = "LFMotor";
     private final static String RFMotorName = "RFMotor";

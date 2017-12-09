@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OldenGarbaege;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
  */
 
 @Autonomous(name="WallerType2Op", group = "Autonomous")
+@Disabled
 public class WallerType2Op extends LinearOpMode{
 
     OpticalDistanceSensor Waller;
