@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Created by FTC on 11/21/2016.
  */
 
-@TeleOp(name = "GrabberOp",group = "drive")
+@TeleOp(name = "GrabberOp (OnBot)",group = "drive")
 public class GrabberOp extends OpMode {
     MechanumDriveBase mechanumDriveBase;
     DcMotor Grabber;
@@ -47,6 +47,3 @@ public class GrabberOp extends OpMode {
         Grabber.setTargetPosition(90);
     }
 }
-
-
-

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -14,11 +16,8 @@ import java.util.Set;
 /**
  * Created by FTC on 12/13/2016.
  */
-
-public class MechanumDriveBaseBkup {
-    private HardwareMap hardwareMap;
-    private Telemetry telemetry;
-
+@TeleOp(group="TEST",name="DriveTester3000")
+public class DriveTester3000Op extends OpMode {
     private final static String LFMotorDefaultName = "LFMotor";
     private final static String RFMotorDefaultName = "RFMotor";
     private final static String LBMotorDefaultName = "LBMotor";
@@ -33,18 +32,26 @@ public class MechanumDriveBaseBkup {
     private DcMotor RFMotor;
     private DcMotor LBMotor;
     private DcMotor RBMotor;
-    public MechanumDriveBaseBkup(HardwareMap hardwareMap, Telemetry telemetry){
-        this.hardwareMap = hardwareMap;
-        this.telemetry = telemetry;
+    public DriveTester3000Op(){
     }
 
 
+    @Override
     public void init() {
         init(   LFMotorDefaultName, LFMotorDefaultReversed,
                 RFMotorDefaultName, RFMotorDefaultReversed,
                 LBMotorDefaultName, LBMotorDefaultReversed,
                 RBMotorDefaultName, RBMotorDefaultReversed);
     }
+
+    @Override
+    public void loop() {
+        LFMotor.setPower(gamepad1.left_stick_y);
+        RFMotor.setPower(gamepad1.right_stick_y);
+        LBMotor.setPower(gamepad2.left_stick_y);
+        RBMotor.setPower(gamepad2.right_stick_y);
+    }
+
     public void init(String LFMotorName, boolean LFMotorReversed,
                      String RFMotorName, boolean RFMotorReversed,
                      String LBMotorName, boolean LBMotorReversed,
@@ -57,6 +64,11 @@ public class MechanumDriveBaseBkup {
         RBMotor.setDirection(RBMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
         LBMotor = hardwareMap.dcMotor.get(LBMotorName);
         LBMotor.setDirection(LBMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
+        RFMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        RBMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        LFMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        LBMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
     }
 
 

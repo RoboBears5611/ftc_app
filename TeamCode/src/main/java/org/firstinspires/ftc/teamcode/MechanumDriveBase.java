@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.sun.tools.javac.util.LayoutCharacters.LF;
+
 /**
  * Created by FTC on 12/13/2016.
  */
@@ -33,6 +35,12 @@ public class MechanumDriveBase {
     private DcMotor RFMotor;
     private DcMotor LBMotor;
     private DcMotor RBMotor;
+
+    private final static double NormalDriveMultiplier = 0.5;
+    private final static double SlowdownVoltage = 8;
+    private final static double SlowdownMultiplier = 0.1;
+    private final static double CutoffVoltage = 6;
+
     public MechanumDriveBase(HardwareMap hardwareMap, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
@@ -57,6 +65,10 @@ public class MechanumDriveBase {
         RBMotor.setDirection(RBMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
         LBMotor = hardwareMap.dcMotor.get(LBMotorName);
         LBMotor.setDirection(LBMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
+        RFMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        RBMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        LFMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        LBMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
 
@@ -68,6 +80,12 @@ public class MechanumDriveBase {
     }
 
     public void move(float x, float y, float turn){
+        move(x,y,turn,false);
+    }
+    public void move(float x, float y, float turn, boolean forceFullPower){
+        move(x,y,turn,forceFullPower,0);
+    }
+    public void move(float x, float y, float turn, boolean forceFullPower, double voltage){
         telemetry.addData("Drive X",x);
         telemetry.addData("Drive Y",y);
         telemetry.addData("Drive Turn",turn);
@@ -75,10 +93,29 @@ public class MechanumDriveBase {
         //good fun.
         double r = Math.hypot(x, y); //Get how far the joystick is pushed
         double robotAngle = Math.atan2(-y, -x) - Math.PI / 4; //Rotate everything 45 degrees, since the wheels operate on tires with an exactly 45 degree offset from forwards and backwards on the robot
-        final double LF = r * Math.cos(robotAngle); //Calculate just how much speed each wheel should get in relation to each other (as stated by some Trig!) and then multiply that by how much power we actually want (Sin and Cos won't give us that, since they are just working with angles)
-        final double RF = r * Math.sin(robotAngle) - turn; //We then subtract or add to the power, according to the wheels orientation to the rest of the bot.  This change causes the robot to turn.
-        final double LB = r * Math.sin(robotAngle) + turn;
-        final double RB = r * Math.cos(robotAngle);
+
+        double motorMultiplier;
+        if(forceFullPower){
+            motorMultiplier = 1; //Disregard all concerns of voltage or control when force full is on.
+        }else{
+            if(voltage == 0){
+                motorMultiplier = NormalDriveMultiplier; //If the voltage is set to 0, that's an indicator that a) something in the volrage sensing system is ascue, and we
+                //  ... need to disregard it, or no voltage was ever actually provided, in which case we also don't care what the voltage is.
+            }else{
+                if(voltage<=CutoffVoltage){
+                    motorMultiplier = 0;
+                }else if(voltage<=SlowdownVoltage){
+                    motorMultiplier = SlowdownMultiplier;
+                }else{
+                    motorMultiplier = NormalDriveMultiplier;
+                }
+            }
+        }
+
+        final double LF = (r * Math.cos(robotAngle) + (turn<0?turn:0))*motorMultiplier; //Calculate just how much speed each wheel should get in relation to each other (as stated by some Trig!) and then multiply that by how much power we actually want (Sin and Cos won't give us that, since they are just working with angles)
+        final double RF = (r * Math.sin(robotAngle) - (turn>0?turn:0))*motorMultiplier ;//We then subtract or add to the power, according to the wheels orientation to the rest of the bot.  This change causes the robot to turn.
+        final double LB = (r * Math.sin(robotAngle) + (turn<0?turn:0))*motorMultiplier;
+        final double RB = (r * Math.cos(robotAngle) - (turn>0?turn:0))*motorMultiplier;
 
         LFMotor.setPower(LF);
         telemetry.addData("LFMotor",LF);
