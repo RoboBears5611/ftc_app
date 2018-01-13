@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.MechanumDriveBase;
  * Created by admin on 11/26/2017.
  */
 
-@TeleOp(group="Test",name="Encoder Test (Tele) (OnBot)")
+@TeleOp(group="Test",name="Encoder Test (Tele)")
 public class TeleEncoderTestOp extends OpMode {
     MechanumDriveBase mechanumDriveBase;
     DcMotor Grabber;

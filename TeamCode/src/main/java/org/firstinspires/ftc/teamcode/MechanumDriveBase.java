@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.sun.tools.javac.util.LayoutCharacters.LF;
 
 /**
  * Created by FTC on 12/13/2016.
@@ -58,16 +57,20 @@ public class MechanumDriveBase {
                      String LBMotorName, boolean LBMotorReversed,
                      String RBMotorName, boolean RBMotorReversed) {
         RFMotor = hardwareMap.dcMotor.get(RFMotorName);
-        RFMotor.setDirection(RFMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
         LFMotor = hardwareMap.dcMotor.get(LFMotorName);
-        LFMotor.setDirection(LFMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
         RBMotor = hardwareMap.dcMotor.get(RBMotorName);
-        RBMotor.setDirection(RBMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
         LBMotor = hardwareMap.dcMotor.get(LBMotorName);
+        RFMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LFMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RBMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LBMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RFMotor.setDirection(RFMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
+        LFMotor.setDirection(LFMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
+        RBMotor.setDirection(RBMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
         LBMotor.setDirection(LBMotorReversed? DcMotorSimple.Direction.REVERSE: DcMotorSimple.Direction.FORWARD);
         RFMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        RBMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         LFMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        RBMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         LBMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
@@ -112,10 +115,10 @@ public class MechanumDriveBase {
             }
         }
 
-        final double LF = (r * Math.cos(robotAngle) + (turn<0?turn:0))*motorMultiplier; //Calculate just how much speed each wheel should get in relation to each other (as stated by some Trig!) and then multiply that by how much power we actually want (Sin and Cos won't give us that, since they are just working with angles)
-        final double RF = (r * Math.sin(robotAngle) - (turn>0?turn:0))*motorMultiplier ;//We then subtract or add to the power, according to the wheels orientation to the rest of the bot.  This change causes the robot to turn.
-        final double LB = (r * Math.sin(robotAngle) + (turn<0?turn:0))*motorMultiplier;
-        final double RB = (r * Math.cos(robotAngle) - (turn>0?turn:0))*motorMultiplier;
+        final double LF = (r * Math.cos(robotAngle) + turn)*motorMultiplier; //Calculate just how much speed each wheel should get in relation to each other (as stated by some Trig!) and then multiply that by how much power we actually want (Sin and Cos won't give us that, since they are just working with angles)
+        final double RF = (r * Math.sin(robotAngle) -  turn)*motorMultiplier ;//We then subtract or add to the power, according to the wheels orientation to the rest of the bot.  This change causes the robot to turn.
+        final double LB = (r * Math.sin(robotAngle) + turn)*motorMultiplier;
+        final double RB = (r * Math.cos(robotAngle) - turn)*motorMultiplier;
 
         LFMotor.setPower(LF);
         telemetry.addData("LFMotor",LF);
@@ -128,3 +131,4 @@ public class MechanumDriveBase {
     }
 
 }
+
