@@ -155,12 +155,14 @@ public class ColorSensorTest1Op extends LinearOpMode {
             boolean isBlue = blue  < 35;
             double red =  calculateAbsoluteAngleDifference(0,hue);
             boolean isRed = red < 18;
+            boolean isClear = sensorRGB.alpha()<175;
 
             telemetry.addData("blueDistance",blue);
             telemetry.addData("isBlue",isBlue);
             telemetry.addData("redDistance",red);
             telemetry.addData("isRed",isRed);
-            boolean isWantedColor = isBlue || isRed;
+            telemetry.addData("isClear",isClear);
+            boolean isWantedColor = !isClear&&(isBlue || isRed);
 
             String ColorString;
             if(!isWantedColor){
