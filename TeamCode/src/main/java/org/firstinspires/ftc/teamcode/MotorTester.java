@@ -66,6 +66,10 @@ public class MotorTester extends OpMode
     private String[] MotorNames;
     private int activeIndex;
     private long lastUpdatetime;
+    private boolean encoderMode = false;
+    private boolean prevEncoderMode;
+    private int encoderSpeed = 5;
+    private final static double encoderSpeedChangeRate = 0.5;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -113,9 +117,11 @@ public class MotorTester extends OpMode
         }else if(gamepad1.left_bumper){
             activeIndex--;
             telemetry.addData("Status","Decrementing motor");
-        }else if(gamepad1.a){
+        }else if(gamepad1.a) {
             activeIndex = 0;
-            telemetry.addData("Status","Returning to start of motor list");
+            telemetry.addData("Status", "Returning to start of motor list");
+        }else if(prevEncoderMode!=encoderMode){
+            update = true;
         }else{
             update = false;
         }
@@ -131,12 +137,29 @@ public class MotorTester extends OpMode
 
 
             ActiveMotor = Motors[activeIndex];
+            if(encoderMode){
+                ActiveMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                ActiveMotor.setPower(1);
+            }else{
+                ActiveMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+
             telemetry.addData("Active Motor",MotorNames[activeIndex]);
         }
         if(ActiveMotor != null){
-            ActiveMotor.setPower(gamepad1.right_stick_y);
+            if(encoderMode){
+                ActiveMotor.setTargetPosition(ActiveMotor.getTargetPosition()+(int)gamepad1.right_stick_y*encoderSpeed);
+                encoderSpeed+=(gamepad1.dpad_up?encoderSpeedChangeRate:0)-(gamepad1.dpad_down?encoderSpeedChangeRate:0);
+            }else{
+                ActiveMotor.setPower(gamepad1.right_stick_y);
+            }
 
             telemetry.addData("Active Motor Power:  ",gamepad1.right_stick_y);
+            telemetry.addData("Mode:  ",encoderMode?"Run Using Encoders":"Run At Power");
+            if(encoderMode){
+                telemetry.addData("Target Position:  ",ActiveMotor.getTargetPosition());
+                telemetry.addData("Encoder Speed:  ",encoderSpeed);
+            }
             telemetry.addData("Active Motor",MotorNames[activeIndex]);
         }
 

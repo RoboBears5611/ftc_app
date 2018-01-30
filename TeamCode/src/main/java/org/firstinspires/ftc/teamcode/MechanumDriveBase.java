@@ -35,7 +35,7 @@ public class MechanumDriveBase {
     private DcMotor LBMotor;
     private DcMotor RBMotor;
 
-    private final static double NormalDriveMultiplier = 0.5;
+    private final static float NormalDriveMultiplier = 0.5f;
     private final static double SlowdownVoltage = 8;
     private final static double SlowdownMultiplier = 0.1;
     private final static double CutoffVoltage = 6;
@@ -101,8 +101,9 @@ public class MechanumDriveBase {
         if(forceFullPower){
             motorMultiplier = 1; //Disregard all concerns of voltage or control when force full is on.
         }else{
+            float NormalWithStrafeJuice = Math.abs(x)>0.5f?1f:NormalDriveMultiplier;
             if(voltage == 0){
-                motorMultiplier = NormalDriveMultiplier; //If the voltage is set to 0, that's an indicator that a) something in the volrage sensing system is ascue, and we
+                motorMultiplier = NormalWithStrafeJuice; //If the voltage is set to 0, that's an indicator that a) something in the volrage sensing system is ascue, and we
                 //  ... need to disregard it, or no voltage was ever actually provided, in which case we also don't care what the voltage is.
             }else{
                 if(voltage<=CutoffVoltage){
@@ -110,13 +111,13 @@ public class MechanumDriveBase {
                 }else if(voltage<=SlowdownVoltage){
                     motorMultiplier = SlowdownMultiplier;
                 }else{
-                    motorMultiplier = NormalDriveMultiplier;
+                    motorMultiplier = NormalWithStrafeJuice;
                 }
             }
         }
 
         final double LF = (r * Math.cos(robotAngle) + turn)*motorMultiplier; //Calculate just how much speed each wheel should get in relation to each other (as stated by some Trig!) and then multiply that by how much power we actually want (Sin and Cos won't give us that, since they are just working with angles)
-        final double RF = (r * Math.sin(robotAngle) -  turn)*motorMultiplier ;//We then subtract or add to the power, according to the wheels orientation to the rest of the bot.  This change causes the robot to turn.
+        final double RF = (r * Math.sin(robotAngle) - turn)*motorMultiplier ;//We then subtract or add to the power, according to the wheels orientation to the rest of the bot.  This change causes the robot to turn.
         final double LB = (r * Math.sin(robotAngle) + turn)*motorMultiplier;
         final double RB = (r * Math.cos(robotAngle) - turn)*motorMultiplier;
 

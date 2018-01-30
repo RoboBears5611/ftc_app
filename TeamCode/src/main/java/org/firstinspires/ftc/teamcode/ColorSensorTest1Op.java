@@ -162,6 +162,7 @@ public class ColorSensorTest1Op extends LinearOpMode {
             telemetry.addData("redDistance",red);
             telemetry.addData("isRed",isRed);
             telemetry.addData("isClear",isClear);
+            telemetry.addData("SECRET MESSAGE","NUMERO QUADRO");
             boolean isWantedColor = !isClear&&(isBlue || isRed);
 
             String ColorString;

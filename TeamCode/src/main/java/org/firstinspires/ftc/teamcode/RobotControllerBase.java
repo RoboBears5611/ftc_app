@@ -1,5 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+/**
+ * Created by admin on 1/25/2018.
+ */
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,55 +18,61 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
  * Created by FTC on 11/21/2016.
  */
 
-@TeleOp(name = "Robot Controller (Full)",group = "drive")
-public class RobotControllerOp extends OpMode {
-    MechanumDriveBase mechanumDriveBase;
-    Servo GrabberLeft;
-    Servo GrabberRight;
-    boolean GrabberState = false;
-    double GrabberOpenPosition = 0.2;
-    double GrabberClosedPosition = 0.525;
-    final static double GrabberPositionAdjustmentAmount = 0.02;
-    DcMotor Lift;
-    VoltageSensor PowerGage;
-    final static String PowerGageName = "Aux";
-    boolean VariableGrabberControl = false;
-    boolean LastGamepad1b = false;
-    boolean LastGamepad1a = false;
+public class RobotControllerBase {
+    private MechanumDriveBase mechanumDriveBase;
+    private Servo GrabberLeft;
+    private Servo GrabberRight;
+    private DcMotor Lift;
+    private VoltageSensor PowerGage;
+    private boolean VariableGrabberControl = false;
+    private boolean GrabberState = false;
+    private boolean LastToggleOpenClosed;
+    private boolean LastToggleVariableControl;
 
-//    DcMotor ResettingMotor;
+    private Telemetry telemetry;
+    private HardwareMap hardwareMap;
+    private RobotControllerDriveControls controls;
+    RobotControllerSettings settings;
+
+    private double GrabberOpenPosition = 0.3;
+    private double GrabberClosedPosition = 0.525;
 
 
-    @Override
-    public void init(){
+    //    DcMotor ResettingMotor;
+    public RobotControllerBase(Telemetry telemetry,  HardwareMap hardwareMap){
+        this.telemetry = telemetry;
+        this.hardwareMap = hardwareMap;
         mechanumDriveBase = new MechanumDriveBase(hardwareMap,telemetry);
+    }
+
+    public void init(RobotControllerSettings settings){
+        this.settings = settings;
         mechanumDriveBase.init();
         GrabberLeft = hardwareMap.servo.get("GrabberLeft");
         GrabberLeft.setDirection(Servo.Direction.REVERSE);
         GrabberRight = hardwareMap.servo.get("GrabberRight");
         Lift = hardwareMap.dcMotor.get("Lift");
         Lift.setDirection(DcMotorSimple.Direction.REVERSE);
-        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if(hardwareMap.dcMotorController.contains(PowerGageName)){
-            PowerGage = hardwareMap.voltageSensor.get(PowerGageName);
+        Lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        if(hardwareMap.dcMotorController.contains(settings.PowerGageName)){
+            PowerGage = hardwareMap.voltageSensor.get(settings.PowerGageName);
         }
         UpdateGrabbers();
     }
 
 
-    @Override
-    public void start(){
+    public void stopAllMotors(){
         mechanumDriveBase.stopAllMotors();
     }
 
-    @Override
-    public void loop(){
-        mechanumDriveBase.move(-gamepad1.left_stick_x,-gamepad1.right_stick_y,gamepad1.right_stick_x,gamepad1.right_bumper,PowerGage==null?0:PowerGage.getVoltage());
+    public void loop(RobotControllerDriveControls controls){
+        this.controls = controls;
+
+        mechanumDriveBase.move(controls.moveX,controls.moveY,controls.moveTurn,controls.moveForceFull,PowerGage==null?0:PowerGage.getVoltage());
         grabberOpenAndClose();
         VariableGrabberControl();
         //EmergencyResets();
-        Lift.setPower(0.5);
-        Lift.setTargetPosition(Lift.getTargetPosition()+(int)((gamepad1.right_trigger-gamepad1.left_trigger)*40));
+        Lift.setPower(controls.liftPower);
 
 
         telemetry.addData("Lift Target Pos",Lift.getTargetPosition());
@@ -67,18 +80,23 @@ public class RobotControllerOp extends OpMode {
         telemetry.addData("LPos",GrabberLeft.getPosition());
     }
 
-    public void grabberOpenAndClose(){
+    public void updateSettings(RobotControllerSettings settings){
+        this.settings = settings;
+        this.GrabberClosedPosition = settings.GrabberClosedPosition;
+        this.GrabberOpenPosition = settings.GrabberOpenPosition;
+    }
+
+    private void grabberOpenAndClose(){
         if(VariableGrabberControl){
             return;
         }
         ChangeOpenClosePos(
-                (gamepad1.dpad_right?GrabberPositionAdjustmentAmount:0)
-                        - (gamepad1.dpad_left?GrabberPositionAdjustmentAmount:0));
-        if(gamepad1.a&&!LastGamepad1a) {                                                  //If the A button is pushed
+                controls.grabberOpenCloseAdjustment);
+        if(controls.grabberToggleOpenClosed&&!LastToggleOpenClosed) {                                                  //If the A button is pushed
             GrabberState = !GrabberState;
             UpdateGrabbers();
         }
-        LastGamepad1a = gamepad1.a;
+        LastToggleOpenClosed = controls.grabberToggleOpenClosed;
     }
 
     private void ChangeOpenClosePos(double amount){
@@ -89,19 +107,19 @@ public class RobotControllerOp extends OpMode {
         }
     }
 
-    public void UpdateGrabbers(){
+    private void UpdateGrabbers(){
         GrabberLeft.setPosition(GrabberState?GrabberClosedPosition:GrabberOpenPosition);
         GrabberRight.setPosition(GrabberState?GrabberClosedPosition:GrabberOpenPosition);
     }
-    public void VariableGrabberControl(){
-        if(gamepad1.b&&!LastGamepad1b){
+    private void VariableGrabberControl(){
+        if(controls.grabberToggleVariableControl&&!LastToggleVariableControl){
             VariableGrabberControl = !VariableGrabberControl;
         }
         if(VariableGrabberControl){
-            GrabberLeft.setPosition((gamepad1.dpad_up?0.5:0)-(gamepad1.dpad_down?0.5:0)+0.5);
-            GrabberRight.setPosition((gamepad1.dpad_up?0.5:0)-(gamepad1.dpad_down?0.5:0)+0.5);
+            GrabberLeft.setPosition(controls.grabberVariableControlPosition);
+            GrabberRight.setPosition(controls.grabberVariableControlPosition);
         }
-        LastGamepad1b = gamepad1.b;
+        LastToggleVariableControl = controls.grabberToggleVariableControl;
     }
 //Unnecessary until we get a Encoder-Enabled Motor that could need resetting
 //    public void EmergencyResets(){
@@ -124,3 +142,4 @@ public class RobotControllerOp extends OpMode {
 //        }
 //    }
 }
+
