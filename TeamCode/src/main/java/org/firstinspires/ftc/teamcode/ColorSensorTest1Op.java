@@ -85,11 +85,11 @@ public class ColorSensorTest1Op extends LinearOpMode {
     // we assume that the LED pin of the RGB sensor is connected to
     // digital port 5 (zero indexed).
     private static final int LED_CHANNEL = 5;
-    private static final double WackerRetractedPosition = 0.5;
-    private static final double WackerExtendedPosition = 0.75;
-    private static final double WackerUpperSensorAdjustment = 0.8;
-    private static final double WackerLowerSensorAdjustment = 0.7;
-    private static final double WackerAdjustmentAmount = 0.02;
+    private static final double WackerRetractedPosition = 0.95;
+    private static final double WackerExtendedPosition = 0.05;
+    private static final double WackerUpperSensorAdjustment = 0.1;
+    private static final double WackerLowerSensorAdjustment = 0;
+    private static final double WackerAdjustmentAmount = 0.01;
 
     @Override
     public void runOpMode() {

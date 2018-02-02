@@ -22,6 +22,7 @@ public class RobotControllerBase {
     private MechanumDriveBase mechanumDriveBase;
     private Servo GrabberLeft;
     private Servo GrabberRight;
+    private Servo SuperWacker3000;
     private DcMotor Lift;
     private VoltageSensor PowerGage;
     private boolean VariableGrabberControl = false;
@@ -54,10 +55,16 @@ public class RobotControllerBase {
         Lift = hardwareMap.dcMotor.get("Lift");
         Lift.setDirection(DcMotorSimple.Direction.REVERSE);
         Lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        SuperWacker3000 = hardwareMap.servo.get("SuperWacker3000");
         if(hardwareMap.dcMotorController.contains(settings.PowerGageName)){
             PowerGage = hardwareMap.voltageSensor.get(settings.PowerGageName);
         }
         UpdateGrabbers();
+    }
+
+    public void start(){
+        SuperWacker3000.setPosition(0.95);
+        stopAllMotors();
     }
 
 
@@ -70,7 +77,7 @@ public class RobotControllerBase {
 
         mechanumDriveBase.move(controls.moveX,controls.moveY,controls.moveTurn,controls.moveForceFull,PowerGage==null?0:PowerGage.getVoltage());
         grabberOpenAndClose();
-        VariableGrabberControl();
+        // VariableGrabberControl();
         //EmergencyResets();
         Lift.setPower(controls.liftPower);
 
