@@ -16,6 +16,7 @@ public class TimeBasedMechanumDriveBase{
 
     public TimeBasedMechanumDriveBase(HardwareMap hardwareMap,Telemetry telemetry){
         mechanumDriveBase = new MechanumDriveBase(hardwareMap,telemetry);
+        timer = new Timer();
 
     }
     public boolean isBusy(){

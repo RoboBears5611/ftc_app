@@ -63,7 +63,7 @@ public class RobotControllerBase {
     }
 
     public void start(){
-        SuperWacker3000.setPosition(0.95);
+        SuperWacker3000.setPosition(0.25);
         stopAllMotors();
     }
 

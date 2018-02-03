@@ -69,14 +69,15 @@ import java.util.Date;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@Autonomous(name = "Test Color Sensor (Hue Method)", group = "Sensor")
-public class ColorSensorTest1Op extends LinearOpMode {
+@Autonomous(name = "Autonomous (Color Sensor)", group = "Sensor")
+public class AutonomousColorSensorOp extends LinearOpMode {
 
     private ColorSensor sensorRGB;
     private DeviceInterfaceModule cdim;
     private Servo SuperWacker3000; //The official name of the extendo color sensor ball wacker arm
     private double StateTransitionTime;
     private CSTState CurrentState = CSTState.Initialization;
+    private TimeBasedMechanumDriveBase timeBasedMechanumDriveBase;
 
 
 
@@ -84,10 +85,10 @@ public class ColorSensorTest1Op extends LinearOpMode {
     // digital port 5 (zero indexed).
     private static final int LED_CHANNEL = 5;
     private static final double WackerRetractedPosition = 0.95;
-    private static final double WackerExtendedPosition = 0.05;
-    private static final double WackerUpperSensorAdjustment = 0.1;
-    private static final double WackerLowerSensorAdjustment = 0;
-    private static final double WackerAdjustmentAmount = 0.01;
+    private static final double WackerExtendedPosition = 0;
+//    private static final double WackerUpperSensorAdjustment = 0.1;
+//    private static final double WackerLowerSensorAdjustment = 0;
+//    private static final double WackerAdjustmentAmount = 0.01;
 
     @Override
     public void runOpMode() {
@@ -118,7 +119,7 @@ public class ColorSensorTest1Op extends LinearOpMode {
         // get a reference to our ColorSensor object.
         sensorRGB = hardwareMap.colorSensor.get("sensor_color");
         SuperWacker3000 = hardwareMap.servo.get("SuperWacker3000");
-        // timeBasedMechanumDriveBase = new TimeBasedMechanumDriveBase(hardwareMap,telemetry);
+        timeBasedMechanumDriveBase = new TimeBasedMechanumDriveBase(hardwareMap,telemetry);
 
 
         // turn the LED on in the beginning, just so user will know that the sensor is active.
@@ -160,7 +161,6 @@ public class ColorSensorTest1Op extends LinearOpMode {
             telemetry.addData("redDistance",red);
             telemetry.addData("isRed",isRed);
             telemetry.addData("isClear",isClear);
-            telemetry.addData("SECRET MESSAGE","NUMERO QUADRO");
             boolean isWantedColor = !isClear&&(isBlue || isRed);
 
             String ColorString;
@@ -192,32 +192,32 @@ public class ColorSensorTest1Op extends LinearOpMode {
                     if(isWantedColor){
                         ChangeState(CSTState.DeterminedColor);
                     }else if(StateTransDeltaMillis>50){
-                        ChangeState(CSTState.AdjustingSensorUp);
+//                        ChangeState(CSTState.AdjustingSensorUp);
                     }
                     break;
-                case DeterminingColorDown:
-                    if(isWantedColor) {
-                        ChangeState(CSTState.DeterminedColor);
-                    }else if(StateTransDeltaMillis>50){
-                        ChangeState(CSTState.AdjustingSensorDown);
-                    }
-                    break;
-                case AdjustingSensorUp:
-                    if(SuperWacker3000.getPosition()>=WackerUpperSensorAdjustment){
-                        ChangeState(CSTState.AdjustingSensorDown);
-                    }
-                    if(StateTransDeltaMillis>50) {
-                        ChangeState(CSTState.DeterminingColor);
-                    }
-                    break;
-                case AdjustingSensorDown:
-                    if(SuperWacker3000.getPosition()<=WackerLowerSensorAdjustment){
-                        ChangeState(CSTState.AdjustingSensorUp);
-                    }
-                    if(StateTransDeltaMillis>50){
-                        ChangeState(CSTState.DeterminingColorDown);
-                    }
-                    break;
+//                case DeterminingColorDown:
+//                    if(isWantedColor) {
+//                        ChangeState(CSTState.DeterminedColor);
+//                    }else if(StateTransDeltaMillis>50){
+//                        ChangeState(CSTState.AdjustingSensorDown);
+//                    }
+//                    break;
+////                case AdjustingSensorUp:
+//                    if(SuperWacker3000.getPosition()>=WackerUpperSensorAdjustment){
+//                        ChangeState(CSTState.AdjustingSensorDown);
+//                    }
+//                    if(StateTransDeltaMillis>50) {
+//                        ChangeState(CSTState.DeterminingColor);
+//                    }
+//                    break;
+//                case AdjustingSensorDown:
+//                    if(SuperWacker3000.getPosition()<=WackerLowerSensorAdjustment){
+//                        ChangeState(CSTState.AdjustingSensorUp);
+//                    }
+//                    if(StateTransDeltaMillis>50){
+//                        ChangeState(CSTState.DeterminingColorDown);
+//                    }
+//                    break;
                 case DeterminedColor:
                     telemetry.addLine("Color Determined as "+ColorString);
                     if(isRed){
@@ -230,7 +230,7 @@ public class ColorSensorTest1Op extends LinearOpMode {
                     break;
                 case DrivingForward:
                 case DrivingBackward:
-                    if(StateTransDeltaMillis>1000){
+                    if(!timeBasedMechanumDriveBase.isBusy()){
                         ChangeState(CSTState.Complete);
                     }
                     break;
@@ -249,14 +249,17 @@ public class ColorSensorTest1Op extends LinearOpMode {
             case ExtendingWacker:
                 SuperWacker3000.setPosition(WackerExtendedPosition);
                 break;
-            case AdjustingSensorDown:
-                SuperWacker3000.setPosition(SuperWacker3000.getPosition()-WackerAdjustmentAmount);
-                break;
-            case AdjustingSensorUp:
-                SuperWacker3000.setPosition(SuperWacker3000.getPosition()+WackerAdjustmentAmount);
-                break;
+//            case AdjustingSensorDown:
+//                SuperWacker3000.setPosition(SuperWacker3000.getPosition()-WackerAdjustmentAmount);
+//                break;
+//            case AdjustingSensorUp:
+//                SuperWacker3000.setPosition(SuperWacker3000.getPosition()+WackerAdjustmentAmount);
+//                break;
             case DrivingForward:
+                timeBasedMechanumDriveBase.move(0,0.25f,0,250);
+                break;
             case DrivingBackward:
+                timeBasedMechanumDriveBase.move(0,-0.25f,0,250);
                 break;
             default:
                 break;  //If there are no special actions to be taken whilst transition, we can just transition and call it good
@@ -266,7 +269,9 @@ public class ColorSensorTest1Op extends LinearOpMode {
     }
 
     private enum CSTState{  //ColorSensorTest States
-        Initialization, DrivingForward, ExtendingWacker,DeterminingColor, DeterminingColorDown, AdjustingSensorUp, AdjustingSensorDown, DrivingBackward, Complete, DeterminedColor
+        Initialization, DrivingForward, ExtendingWacker,DeterminingColor,
+        //DeterminingColorDown, AdjustingSensorUp, AdjustingSensorDown,
+        DrivingBackward, Complete, DeterminedColor
 
     }
 
